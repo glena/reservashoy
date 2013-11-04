@@ -13,12 +13,17 @@ if ($_SERVER["HTTP_HOST"] != 'reservashoy.com.ar')
 <!DOCTYPE html>
 <html>
   <head>
+  
+	<!--[if lt IE 9]><script type="text/javascript" src="flashcanvas.js"></script><![endif]-->
+	<script type="text/javascript" src="canvg.js"></script> 
+	<script type="text/javascript" src="rgbcolor.js"></script>
+	<script type="text/javascript" src="grChartImg.js"></script>   
 <?
 $cacheFile = 'chart.data';
 if (!file_exists($cacheFile) || filemtime ( $cacheFile ) + 86400 < time()) /*si hace mas de un dia*/
 {
 	echo "<!-- RELOAD -->";
-	$apiKey = 'c237ff6028b3f772ddd00073bfa5c41a57c7032a';
+	$apiKey = 'apikey';
 	$url = "http://datosdemocraticos.com.ar/api/v1/reservas_internacionales_bcra.json?apikey=$apiKey";
 
 	$ch = curl_init();
@@ -78,19 +83,19 @@ foreach ($datos as $dato)
 ?>
 	<title>Actualmente hay u$s <?=number_format ( $lastMonto, 0, ',', '.' )?> millones en las reservas del BCRA.</title>
 
-    <meta content="Monitoreamos las reservas del banco dï¿½a a dï¿½a. Fuente: datosdemocraticos.com.ar" name="description" />
+    <meta content="Monitoreamos las reservas del banco d&aacute;a a d&aacute;a. Fuente: datosdemocraticos.com.ar" name="description" />
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
       google.load("visualization", "1", {packages:["corechart"]});
       google.setOnLoadCallback(drawChart);
       function drawChart() {
         var data = google.visualization.arrayToDataTable([
-          ['Aï¿½o', 'Monto']
+          ['Año', 'Monto']
           <?= $chartData ?>
         ]);
 
         var options = {
-          title: 'Reservas Internacionales del B.C.R.A.'
+          title: 'Reservas Internacionales del B.C.R.A. - reservashoy.com.ar'
         };
 
         var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
@@ -118,6 +123,11 @@ foreach ($datos as $dato)
 		div.total-hoy {
 			text-align:center;
 			font-size:20px;
+		}
+		div.get-image {
+			text-align:right;
+			width:900px;
+			margin:auto;
 		}
 		.share{
 			width: 600px; 
@@ -163,7 +173,7 @@ foreach ($datos as $dato)
   </head>
   <body>
 	<div class="header">
-		<h1>Las reservas del BCRA dï¿½a a dï¿½a - <a href="http://datosdemocraticos.com.ar">Datos Democrï¿½ticos</a></h1>
+		<h1>Las reservas del BCRA d&iacute;a a d&iacute;a - <a href="http://datosdemocraticos.com.ar">Datos Democr&aacute;ticos</a></h1>
 		<img width="160" height="160" src="datos-democraticos-160.png" alt="logo" class="logo">
 	</div>
 	
@@ -187,12 +197,31 @@ foreach ($datos as $dato)
 	
     <div id="chart_div" ></div>
 	
+	<div class="get-image">
+		<a href="#" onclick="showImage()">Obtener imagen</a>
+	</div>
 	<div class="total-hoy">
 		<span>Actualmente hay<br/><strong>u$s <?=number_format ( $lastMonto, 0, ',', '.' )?> millones</strong></span>
 	</div>
 	
 	<div class="footer">
-		<p>Datos democrï¿½ticos 2013 - <a href="http://datosdemocraticos.com.ar">datosdemocraticos.com.ar</a> - Usando el Dataset <a href="http://datosdemocraticos.com.ar/api/v1/reservas_internacionales_bcra">Reservas Internacionales del B.C.R.A.</a></p>
+		<p>Datos democr&aacute;ticos 2013 - <a href="http://datosdemocraticos.com.ar">datosdemocraticos.com.ar</a> - Usando el Dataset <a href="http://datosdemocraticos.com.ar/api/v1/reservas_internacionales_bcra">Reservas Internacionales del B.C.R.A.</a></p>
 	</div>
+	
+	<script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	  ga('create', 'UA-45371545-1', 'reservashoy.com.ar');
+	  ga('send', 'pageview');
+
+	  function showImage()
+	  {	
+		grChartImg.ShowImage('chart_div', true);
+	  }
+	  
+	</script>
   </body>
 </html>
