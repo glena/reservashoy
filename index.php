@@ -6,6 +6,8 @@
 		header("Location: http://reservashoy.com.ar/");
 		exit();
 	}
+	
+	header('Content-type: text/html; charset=utf-8'); 
 
 ?>
 
@@ -15,7 +17,12 @@
 	<head>
 
 		<script src="http://d3js.org/d3.v3.min.js"></script>
-		<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.min.js"></script>
+		<script src="d3.tip.js"></script>
+		
+		<!--[if lt IE 9]><script type="text/javascript" src="flashcanvas.js"></script><![endif]-->
+		<script type="text/javascript" src="canvg.js"></script> 
+		<script type="text/javascript" src="rgbcolor.js"></script>
+		<script type="text/javascript" src="grChartImg.js"></script>  
 
 		<meta content="Monitoreamos las reservas del banco d&aacute;a a d&aacute;a. Fuente: datosdemocraticos.com.ar" name="description" />
 		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -35,7 +42,7 @@
 				color: #ffffff;
 				text-align: center;
 				text-shadow: 0 1px 2px rgba(0,0,0,0.6);
-				margin-botton:10px;
+				margin-bottom:10px;
 			}
 			div.total-hoy {
 				text-align:center;
@@ -123,6 +130,7 @@
 			.d3-tip .extra-info {
 				padding-top: 5px;
 			}
+			.d3-tip .event{font-size:12px;color:red;padding-top:5px}
 
 		</style>
 
@@ -156,7 +164,7 @@
 		
 		</div>
 
-		<div class="chart_div" ></div>
+		<div class="chart_div" id="chart_div"></div>
 
 		<div class="total-hoy">
 			<span>Al d&iacute;a <span class="actualmente_fecha"></span> hay<br/><strong>u$s <span class="actualmente_monto"></span> millones</strong></span>
@@ -166,7 +174,7 @@
 			<p>Datos democr&aacute;ticos 2013 - <a href="http://datosdemocraticos.com.ar?l=2">datosdemocraticos.com.ar</a> - Usando el Dataset <a href="http://datosdemocraticos.com.ar/api/v1/reservas_internacionales_bcra">Reservas Internacionales del B.C.R.A.</a> - <a href="http://datosdemocraticos.com.ar/contacto?l=1">Contacto</a></p>
 		</div>
 		
-		<a href="https://github.com/glena/reservashoy"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
+		<a href="https://github.com/glena/reservashoy" onclick="ga('sendsend', 'event', 'github', 'click');"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
 
 		<script>
 		
@@ -174,14 +182,9 @@
 			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
 			ga('create', 'UA-45371545-1', 'reservashoy.com.ar');
 			ga('send', 'pageview');
-		
-		</script>
-
-
-		<script>
+			
 			d3.selection.prototype.moveToFront = function() {
 				return this.each(function(){
 					this.parentNode.appendChild(this);
@@ -197,6 +200,7 @@
 				'11/09/2013' : 'Vencimiento Bonar VII',
 				'30/09/2013' : 'Fin del blanqueamiento de capitales',
 				'28/10/2013' : 'Elecciones Legislativas',
+				"03/12/2013":"Aumento de las retenciones por compras en el exterior al 35%",
 			};
 
 			var margin = {top: 20, right: 20, bottom: 100, left: 70},
@@ -237,6 +241,7 @@
 
 						if (hitos[format(d.fecha)] != undefined)
 						{
+							html+='<div class="event">Evento:</div>';
 							html += '<div class="extra-info">'+ hitos[format(d.fecha)] +'</div>';
 						}
 
@@ -306,7 +311,10 @@
 						})
 						.attr("cx", function(d) { return x(d.fecha); })
         				.attr("cy", function(d) { return y(d.monto); })
-        				.on('mouseover', tip.show)
+        				.on('mouseover', function(d){
+							ga('send', 'event', 'circle', 'show', format(d.fecha));
+							tip.show(d);
+						})
       					.on('mouseout', tip.hide);
 
 				var lastItem = data[data.length-1];
@@ -320,6 +328,10 @@
 
 				document.title = 'Hay u$s '+ ultimo_monto +' millones al '+ ultima_fecha +' en las reservas del BCRA.'
 			});
+			
+			function showImage(){
+				grChartImg.ShowImage('chart_div', true);
+			}
 
 		</script>
 	</body>
