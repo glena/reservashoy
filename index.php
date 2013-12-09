@@ -104,14 +104,6 @@
 				stroke: steelblue;
 				stroke-width: 1.5px;
 			}
-
-			circle {
-				fill:blue;
-			}
-
-			circle.with-data {
-				fill:orange;
-			}
 			circle:hover {
 				fill:red;
 			}
@@ -165,6 +157,10 @@
 		</div>
 
 		<div class="chart_div" id="chart_div"></div>
+		
+		<div class="get-image">
+			<a href="#" onclick="showImage();ga('send', 'event', 'grafico', 'obtener_imagen');">Descargar gr&aacute;fico</a>
+		</div>
 
 		<div class="total-hoy">
 			<span>Al d&iacute;a <span class="actualmente_fecha"></span> hay<br/><strong>u$s <span class="actualmente_monto"></span> millones</strong></span>
@@ -192,15 +188,17 @@
 			};
 
 			var hitos = {
-				'05/11/2012' : 'Comienzo de retenciones al 15%',
-				'18/03/2013' : 'Aumento de retenciones al 20%',
-				'27/06/2013' : 'Devaluacion del oro',
-				'02/07/2013' : 'Inicio Cedin y BAADE',
-				'13/08/2013' : 'Elecciones Primarias',
-				'11/09/2013' : 'Vencimiento Bonar VII',
-				'30/09/2013' : 'Fin del blanqueamiento de capitales',
-				'28/10/2013' : 'Elecciones Legislativas',
+				"05/11/2012":"Comienzo de retenciones al 15%",
+				"18/03/2013":"Aumento de retenciones al 20%",
+				"27/06/2013":"Devaluacion del oro",
+				"02/07/2013":"Inicio Cedin y BAADE",
+				"13/08/2013":"Elecciones Primarias",
+				"11/09/2013":"Vencimiento Bonar VII",
+				"30/09/2013":"Fin del blanqueamiento de capitales",
+				"28/10/2013":"Elecciones Legislativas",
 				"03/12/2013":"Aumento de las retenciones por compras en el exterior al 35%",
+				"12/11/2013":"Venta de dolares para el mercado interno, improtaci&oacute;n de combustibles y pago de deuda.",
+				"29/11/2013":"Ventas por 30 millones de d&oacute;lares en el mercado de cambios, y los pagos de deuda (Global 2017 y Bonar 18) que se realizan con los billetes del organismo."
 			};
 
 			var margin = {top: 20, right: 20, bottom: 100, left: 70},
@@ -258,7 +256,7 @@
 
 			
 
-			d3.tsv("data.tsv", function(error, data) {
+			d3.tsv("data.tsv?r="+Math.random(), function(error, data) {
 				data.forEach(function(d) {
 					d.fecha = parseDate(d.fecha);
 					d.monto = +d.monto;
@@ -267,28 +265,54 @@
 				x.domain(d3.extent(data, function(d) { return d.fecha; }));
 				y.domain(d3.extent(data, function(d) { return d.monto; }));
 
-				svg.append("g")
+				var xAxilsEl = svg.append("g")
 						.attr("class", "x axis")
 						.attr("transform", "translate(0," + height + ")")
-						.call(xAxis)
-							.selectAll("text")
+						.call(xAxis);
+				
+				xAxilsEl.selectAll("path")
+						.attr("fill", "none")
+						.attr("fill-opacity","1")
+						.attr("stroke","#000000")
+						.attr("stroke-width","1px");
+				
+				xAxilsEl.selectAll("text")
 							.style("text-anchor", "end")
 							.attr("transform", "rotate(-60)");
-
-				svg.append("g")
+				
+				var yAxisEl = svg.append("g")
 						.attr("class", "y axis")
-						.call(yAxis)
-							.append("text")
+						.call(yAxis);
+						
+				yAxisEl.append("text")
 							.attr("transform", "rotate(-90)")
 							.attr("y", 6)
 							.attr("dy", ".71em")
 							.style("text-anchor", "end")
 							.text("Valor (millones u$S)");
+											
+				yAxisEl.selectAll("path")
+						.attr("fill", "none")
+						.attr("fill-opacity","1")
+						.attr("stroke","#000000")
+						.attr("stroke-width","1px");
 
 				var path = svg.append("path")
 						.datum(data)
+						.attr("fill", "none")
+						.attr("fill-opacity","1")
+						.attr("stroke","#4682b4")
+						.attr("stroke-width","1.5px")
 						.attr("class", "line")
 						.attr("d", line);
+						
+				var path = svg.append("text")
+						.attr("x", "250")
+						.attr("y", "200")
+						.attr("font-size","20px")
+						.attr("fill","#BBBBBB")
+						.style("text-anchor", "center")
+						.text("reservashoy.com.ar - datosdemocraticos.com.ar");
 
 				svg.selectAll("circle").data(data)
   						.enter()
@@ -298,6 +322,14 @@
 							if (hitos[format(d.fecha)] != undefined)
 							{
 								classname = 'with-data';
+							}
+							return classname; 
+						})
+						.attr("fill", function (d) { 
+							var classname = '#0000FF';
+							if (hitos[format(d.fecha)] != undefined)
+							{
+								classname = 'orange';
 							}
 							return classname; 
 						})
