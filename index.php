@@ -17,12 +17,12 @@
 	<head>
 
 		<script src="http://d3js.org/d3.v3.min.js"></script>
-		<script src="d3.tip.js"></script>
+		<script src="/js/d3.tip.js"></script>
 		
-		<!--[if lt IE 9]><script type="text/javascript" src="flashcanvas.js"></script><![endif]-->
-		<script type="text/javascript" src="canvg.js"></script> 
-		<script type="text/javascript" src="rgbcolor.js"></script>
-		<script type="text/javascript" src="grChartImg.js"></script>  
+		<!--[if lt IE 9]><script type="text/javascript" src="/js/flashcanvas.js"></script><![endif]-->
+		<script type="text/javascript" src="/js/canvg.js"></script> 
+		<script type="text/javascript" src="/js/rgbcolor.js"></script>
+		<script type="text/javascript" src="/js/grChartImg.js"></script>  
 
 		<meta content="Monitoreamos las reservas del banco d&aacute;a a d&aacute;a. Fuente: datosdemocraticos.com.ar" name="description" />
 		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
