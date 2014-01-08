@@ -356,7 +356,7 @@
 
 				d3.selectAll("circle.with-data").moveToFront();
 						 
-				rect.call(d3.behavior.zoom().x(x).y(y).on("zoom", draw));	
+				rect.call(d3.behavior.zoom().x(x).y(y).scaleExtent([1,15]).on("zoom", draw));	
 				draw();
 				
 				var lastItem = data[data.length-1];
