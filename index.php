@@ -15,6 +15,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
+	
+		<title>Visualización del valor de las reservas del BCRA - reservashoy.com.ar</title>
 
 		<script src="http://d3js.org/d3.v3.min.js"></script>
 		<script src="/js/d3.tip.js"></script>
@@ -48,10 +50,12 @@
 				text-align:center;
 				font-size:20px;
 			}
-			div.get-image {
-				text-align:right;
+			div.actions {
 				width:80%;
 				margin:auto;
+			}
+			div.actions .obtenerGrafico{
+				float:right;
 			}
 			.share{
 				width: 600px; 
@@ -123,6 +127,7 @@
 				padding-top: 5px;
 			}
 			.d3-tip .event{font-size:12px;color:red;padding-top:5px}
+			.centered{text-align:center}
 
 		</style>
 
@@ -157,9 +162,11 @@
 		</div>
 
 		<div class="chart_div" id="chart_div"></div>
-		
-		<div class="get-image">
-			<a href="#" onclick="showImage();ga('send', 'event', 'grafico', 'obtener_imagen');">Descargar gr&aacute;fico</a>
+		<div class="actions centered"><small>Es posible hacer zoom utilizando la rueda del mouse sobre el gr&aacute;fico para una mejor visualizaci&oacute;n.</small></div>
+		<div class="actions">
+			<input type="checkbox" id="udpateYAxis" onclick="udpateYAxis(this.checked);"/>
+			<label for="udpateYAxis">Mostrar grafico completo</label>
+			<a href="#" class="obtenerGrafico" onclick="showImage();ga('send', 'event', 'grafico', 'obtener_imagen');">Descargar gr&aacute;fico</a>
 		</div>
 
 		<div class="total-hoy">
@@ -172,7 +179,7 @@
 		
 		<a href="https://github.com/glena/reservashoy" onclick="ga('sendsend', 'event', 'github', 'click');"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
 
-		<script>
+		<script> 
 		
 			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -201,6 +208,8 @@
 				"29/11/2013":"Ventas por 30 millones de d&oacute;lares en el mercado de cambios, y los pagos de deuda (Global 2017 y Bonar 18) que se realizan con los billetes del organismo."
 			};
 
+			var totalYAxis = false;
+			
 			var margin = {top: 20, right: 20, bottom: 100, left: 70},
 				width = 960 - margin.left - margin.right,
 				height = 500 - margin.top - margin.bottom;
@@ -209,11 +218,8 @@
 			var format = d3.time.format("%d/%m/%Y");
 			var parseDate = format.parse;
 
-			var x = d3.time.scale()
-					.range([0, width]);
-
-			var y = d3.scale.linear()
-					.range([height, 0]);
+			var x = d3.time.scale().range([0, width]);
+			var y = d3.scale.linear().range([height, 0]);
 
 			var xAxis = d3.svg.axis()
 					.scale(x)
@@ -254,48 +260,57 @@
 					.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 					.call(tip);
 
+			var rect = svg.append("svg:rect")
+					.attr("class", "pane")
+					.attr("width", width)
+					.attr("height", height)
+					.attr("fill","white");
+					
+			svg.append("text")
+					  .attr("x", width/2)
+					  .attr("y", height/2)
+					  .attr("font-size","20px")
+					  .attr("fill","#BBBBBB")
+					  .style("text-anchor", "middle")
+					  .text("reservashoy.com.ar - datosdemocraticos.com.ar");
 			
+			var xAxilsEl = svg.append("g")
+			  .attr("class", "x axis")
+			  .attr("transform", "translate(0," + height + ")")
+			  .call(xAxis);
+			  
+			xAxilsEl.selectAll("path")
+			  .attr("fill", "none")
+			  .attr("fill-opacity","1")
+			  .attr("stroke","#000000")
+			  .attr("stroke-width","1px");
+			  
+			var yAxisEl = svg.append("g")
+				.attr("class", "y axis")
+				.call(yAxis);
 
-			d3.tsv("data.tsv?r="+Math.random(), function(error, data) {
+			yAxisEl.selectAll("path")
+				.attr("fill", "none")
+				.attr("fill-opacity","1")
+				.attr("stroke","#000000")
+				.attr("stroke-width","1px");
+				
+			yAxisEl.append("text")
+					.attr("transform", "rotate(-90)")
+					.attr("y", 6)
+					.attr("dy", ".71em")
+					.style("text-anchor", "end")
+					.text("Valor (millones u$S)");
+			var data;		
+			d3.tsv("data.tsv?r="+Math.random(), function(error, dataset) {
+				data = dataset;
 				data.forEach(function(d) {
 					d.fecha = parseDate(d.fecha);
 					d.monto = +d.monto;
 				});
-
+				
 				x.domain(d3.extent(data, function(d) { return d.fecha; }));
-				y.domain(d3.extent(data, function(d) { return d.monto; }));
-
-				var xAxilsEl = svg.append("g")
-						.attr("class", "x axis")
-						.attr("transform", "translate(0," + height + ")")
-						.call(xAxis);
-				
-				xAxilsEl.selectAll("path")
-						.attr("fill", "none")
-						.attr("fill-opacity","1")
-						.attr("stroke","#000000")
-						.attr("stroke-width","1px");
-				
-				xAxilsEl.selectAll("text")
-							.style("text-anchor", "end")
-							.attr("transform", "rotate(-60)");
-				
-				var yAxisEl = svg.append("g")
-						.attr("class", "y axis")
-						.call(yAxis);
-						
-				yAxisEl.append("text")
-							.attr("transform", "rotate(-90)")
-							.attr("y", 6)
-							.attr("dy", ".71em")
-							.style("text-anchor", "end")
-							.text("Valor (millones u$S)");
-											
-				yAxisEl.selectAll("path")
-						.attr("fill", "none")
-						.attr("fill-opacity","1")
-						.attr("stroke","#000000")
-						.attr("stroke-width","1px");
+				updateDomain();
 
 				var path = svg.append("path")
 						.datum(data)
@@ -306,16 +321,8 @@
 						.attr("class", "line")
 						.attr("d", line);
 						
-				var path = svg.append("text")
-						.attr("x", "250")
-						.attr("y", "200")
-						.attr("font-size","20px")
-						.attr("fill","#BBBBBB")
-						.style("text-anchor", "center")
-						.text("reservashoy.com.ar - datosdemocraticos.com.ar");
-
-				svg.selectAll("circle").data(data)
-  						.enter()
+				var circles = svg.selectAll("circle").data(data);
+  				circles.enter()
 						.append("circle")
 						.attr("class", function (d) { 
 							var classname = '';
@@ -341,14 +348,17 @@
 							}
 							return size; 
 						})
-						.attr("cx", function(d) { return x(d.fecha); })
-        				.attr("cy", function(d) { return y(d.monto); })
         				.on('mouseover', function(d){
 							ga('send', 'event', 'circle', 'show', format(d.fecha));
 							tip.show(d);
 						})
       					.on('mouseout', tip.hide);
 
+				d3.selectAll("circle.with-data").moveToFront();
+						 
+				rect.call(d3.behavior.zoom().x(x).y(y).on("zoom", draw));	
+				draw();
+				
 				var lastItem = data[data.length-1];
 				var ultima_fecha = format(lastItem.fecha);
 				var ultimo_monto = lastItem.monto.toLocaleString();
@@ -356,10 +366,38 @@
 				d3.select(".actualmente_fecha").html(ultima_fecha);
 				d3.select(".actualmente_monto").html(ultimo_monto);
 
-				d3.selectAll("circle.with-data").moveToFront();
-
 				document.title = 'Hay u$s '+ ultimo_monto +' millones al '+ ultima_fecha +' en las reservas del BCRA.'
 			});
+			
+			function updateDomain()
+			{
+				if (!totalYAxis)
+				{
+					y.domain(d3.extent(data, function(d) { return d.monto; }));	
+				}
+				else
+				{
+					y.domain([0,d3.max(data, function(d) { return d.monto; })]);
+				}
+			}
+			
+			function udpateYAxis(value){
+				totalYAxis = value;
+				updateDomain();
+				rect.call(d3.behavior.zoom().x(x).y(y).on("zoom", draw));
+				draw();
+			}
+			
+			function draw() {
+				svg.select("g.x.axis").call(xAxis);
+				svg.select("g.y.axis").call(yAxis);
+				svg.select("path.line").attr("d", line);
+				svg.selectAll("circle").attr("cx", function(d) { return x(d.fecha); }).attr("cy", function(d) { return y(d.monto); });
+
+				xAxilsEl.selectAll("text")
+					.style("text-anchor", "end")
+					.attr("transform", "rotate(-60)");
+			}
 			
 			function showImage(){
 				grChartImg.ShowImage('chart_div', true);
