@@ -16,7 +16,7 @@
 <html>
 	<head>
 	
-		<title>Visualización del valor de las reservas del BCRA - reservashoy.com.ar</title>
+		<title>Visualizacion del valor de las reservas del BCRA - reservashoy.com.ar</title>
 
 		<script src="http://d3js.org/d3.v3.min.js"></script>
 		<script src="/js/d3.tip.js"></script>
@@ -174,7 +174,7 @@
 		</div>
 
 		<div class="footer">
-			<p>Datos democr&aacute;ticos 2013 - <a href="http://datosdemocraticos.com.ar?l=2">datosdemocraticos.com.ar</a> - Usando el Dataset <a href="http://datosdemocraticos.com.ar/api/v1/reservas_internacionales_bcra">Reservas Internacionales del B.C.R.A.</a> - <a href="http://datosdemocraticos.com.ar/contacto?l=1">Contacto</a></p>
+			<p>Datos democr&aacute;ticos 2013 - Copyright 2014 GermÃ¡n Lena - <a href="http://datosdemocraticos.com.ar?l=2">datosdemocraticos.com.ar</a> - Usando el Dataset <a href="http://datosdemocraticos.com.ar/api/v1/reservas_internacionales_bcra">Reservas Internacionales del B.C.R.A.</a> - <a href="http://datosdemocraticos.com.ar/contacto?l=1">Contacto</a></p>
 		</div>
 		
 		<a href="https://github.com/glena/reservashoy" onclick="ga('sendsend', 'event', 'github', 'click');"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
