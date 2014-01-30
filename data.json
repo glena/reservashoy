@@ -1,0 +1,11 @@
+{"ultimos7dias":[
+
+{"fecha":"2014-01-1","monto":20212,"informacion":"nuevo!"},
+{"fecha":"2014-01-2","monto":30212,"informacion":"nuevo!"},
+{"fecha":"2014-01-3","monto":30212,"informacion":"nuevo!"},
+{"fecha":"2014-01-4","monto":30212,"informacion":"nuevo!"},
+{"fecha":"2014-01-5","monto":30212,"informacion":"nuevo!"},
+{"fecha":"2014-01-6","monto":30212,"informacion":"nuevo!"},
+{"fecha":"2014-01-7","monto":40212,"informacion":"nuevo!"}
+
+],"ultimos30dias":[{"fecha":"2013-12-30","informacion":"","monto":30599},{"fecha":"2014-01-02","informacion":"","monto":30586},{"fecha":"2014-01-03","informacion":"","monto":30529},{"fecha":"2014-01-06","informacion":"","monto":30352},{"fecha":"2014-01-07","informacion":"","monto":30437},{"fecha":"2014-01-08","informacion":"","monto":30230},{"fecha":"2014-01-09","informacion":"","monto":30222},{"fecha":"2014-01-10","informacion":"","monto":30156},{"fecha":"2014-01-13","informacion":"","monto":30105},{"fecha":"2014-01-14","informacion":"","monto":30025},{"fecha":"2014-01-15","informacion":"","monto":29863},{"fecha":"2014-01-17","informacion":"","monto":29681},{"fecha":"2014-01-25","monto":111,"informacion":"nuevo!"}],"ultimos12meses":[{"fecha":"2013-01-01","monto":127828,"informacion":"0"},{"fecha":"2013-02-01","monto":716599,"informacion":"0"},{"fecha":"2013-03-01","monto":783374,"informacion":"0"},{"fecha":"2013-04-01","monto":800709,"informacion":"0"},{"fecha":"2013-05-01","monto":857495,"informacion":"0"},{"fecha":"2013-06-01","monto":688769,"informacion":"0"},{"fecha":"2013-07-01","monto":820636,"informacion":"0"},{"fecha":"2013-08-01","monto":776870,"informacion":"0"},{"fecha":"2013-09-01","monto":748467,"informacion":"0"},{"fecha":"2013-10-01","monto":752867,"informacion":"0"},{"fecha":"2013-11-01","monto":611931,"informacion":"0"},{"fecha":"2013-12-01","monto":581194,"informacion":"0"},{"fecha":"2014-01-01","monto":332297,"informacion":"0"}]}
