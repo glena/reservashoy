@@ -30,7 +30,8 @@ ul.menu li.title {
 	color:#D70002;
 	font-size: 25px;
 	text-align: center;
-	width: 150px;
+	width: 155px;
+	line-height: 40px;
 }
 ul.menu li.item {
 	color:#8d8d8d;

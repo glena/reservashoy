@@ -1,5 +1,5 @@
 <?php
-
+echo "Inicio \n";
 function get($url)
 {
 	$ch = curl_init();
@@ -19,7 +19,7 @@ function get($url)
 
 function getUrl($apiKey, $page = '')
 {
-	return "http://datosdemocraticos.com.ar/api/v1/reservas_internacionales_bcra$page.json?apikey=$apiKey";
+	return "http://datosdemocraticos.com.ar/api/v1/reservas_internacionales_bcra$page.json?apikey=$apiKey&reverse=1";
 
 	//return "http://localhost:3000/api/v1/reservas_internacionales_bcra$page.json?apikey=$apiKey";
 }
@@ -76,15 +76,8 @@ if ($response->estado == 'ok')
 	{
 		echo "Procesando " . $item->fecha;
 		echo "\n";
-		list($dia,$mes,$anio) = explode('/', $item->fecha);
-		//$fecha = strtotime($item->fecha);
-		$fecha = strtotime("$anio-$mes-$dia");
+		$fecha = strtotime($item->fecha);
 		$item->fecha = date('Y-m-d', $fecha);
-
-		if (!isset($item->informacion))
-		{
-			$item->informacion = 'Informacion fecha ' . date('Y-m-d', $fecha);
-		}
 
 		if ($fecha >= $hace7dias)
 		{
@@ -116,19 +109,42 @@ if ($response->estado == 'ok')
 		foreach($mes as $dia)
 		{
 			$monto += $dia->monto;
-			$informacion += trim($item->informacion,' .') . '. ';
+			if (trim($dia->informacion) != '')
+			{
+				$informacion .= trim($dia->informacion,' .') . '. ';
+			}
 		}
 
-		$new_data['ultimos12meses'][] = array(
-			"fecha" => $fecha,
-			"monto" => $monto / count($mes),
-			"informacion" => trim($informacion)
-		);
+		$o = new stdClass();
+		$o->fecha = $fecha;
+		$o->monto = ceil($monto / count($mes));
+		$o->informacion = trim($informacion);
+
+		$new_data['ultimos12meses'][] = $o;
 	}
 
+	function sortDesc ($a, $b) {
+		$a = strtotime($a->fecha);
+		$b = strtotime($b->fecha);
+		
+		if ($a == $b) {
+			return 0;
+		}
+		return ($a < $b) ? -1 : 1;
+	}
+
+	uasort ( $new_data['ultimos7dias'] , 'sortDesc');
+	uasort ( $new_data['ultimos30dias'] , 'sortDesc');
+	uasort ( $new_data['ultimos12meses'] , 'sortDesc');
+
+	$new_data['ultimos7dias'] = array_values($new_data['ultimos7dias']);
+	$new_data['ultimos30dias'] = array_values($new_data['ultimos30dias']);
+	$new_data['ultimos12meses'] = array_values($new_data['ultimos12meses']);
 
 	$f = fopen($cacheFile, 'w');
 	fwrite ( $f , json_encode($new_data) );
 	fclose($f);
 	
 }
+
+echo "Fin \n";

@@ -29,10 +29,10 @@ var chart = (function (options) {
 			width:960,
 			height:500,
 			margin: {
-				top: 20, 
+				top: 100, 
 				right: 20, 
-				bottom: 100, 
-				left: 70
+				bottom: 50, 
+				left: 140
 			}
 		},
 //     Range function from:
@@ -59,7 +59,9 @@ var chart = (function (options) {
             return range;
         },
 	
+		htmlWrapper:null,
 		svg: null,
+		container: null,
 
 		x:null,
 		y:null,
@@ -90,9 +92,11 @@ var chart = (function (options) {
 							.scale(this.y)
 							.orient("left");
 
-            this.svg = d3.select(this.options.selector).append("svg")
+			this.htmlWrapper = d3.select(this.options.selector).style("position", 'relative');;
+			this.container = this.htmlWrapper.append("svg")
                             .attr("width", this.options.width)
-                            .attr("height", this.options.height)
+                            .attr("height", this.options.height); 
+            this.svg = 	this.container
                             .append("g")
                             .attr("transform", "translate(" + [ this.options.margin.left , this.options.margin.top ] + ")");
               
@@ -101,6 +105,12 @@ var chart = (function (options) {
 							.call(this.yAxis);
 
 			yAxisEl.selectAll("path").attr("fill-opacity","0");
+
+			yAxisEl.append("text")
+					.attr("transform", "rotate(-90) translate(-5,-65)")
+					.style("text-anchor", "end")
+					.text("Valor: Millones U$S");
+
 
 			var scope = this;
 			d3.json("data.json?r="+Math.random(), function(error, dataset) {
@@ -132,22 +142,22 @@ var chart = (function (options) {
 			if (this.currentSet == '7d') return;
           	this.currentSet = '7d';
 			this.setCurrentData(this.data.ultimos7dias);
-          	this.loadData();	
+          	this.loadData(d3.time.format("%d/%m"));	
 		},
 		mostrarUltimos30Dias: function() {
 			if (this.currentSet == '30d') return;
 			this.currentSet = '30d';
 			this.setCurrentData(this.data.ultimos30dias);
-			this.loadData();
+			this.loadData(d3.time.format("%d"));
 		},
 		mostrarUltimos12Meses: function() {
 			if (this.currentSet == '12m') return;
           	this.currentSet = '12m';
 			this.setCurrentData(this.data.ultimos12meses);
-          	this.loadData();
+          	this.loadData(d3.time.format("%b"));
 		},
 
-		loadData: function() {
+		loadData: function(xAxisFormat) {
 
 			var data = this.currentData;
 
@@ -166,10 +176,32 @@ var chart = (function (options) {
             );
                     
           	this.svg.select("g.y.axis").call(this.yAxis);
-          	this.svg.selectAll("g.y.axis text").attr("font-size","15px");
+          	this.svg.selectAll("g.y.axis text")
+          		.attr("font-size","15px")
+          		.attr('fill', '#686868');
+
+			this.svg.selectAll('rect.bg')
+				.transition()
+					.attr("width", 0) 
+					.attr("x", this.innerWidth)
+					.remove();
+
+			this.svg.selectAll('rect.value')
+				.classed('value',false)
+				.transition()
+					.attr("width", 0) 
+					.attr("x", this.innerWidth)
+					.remove();
+
+			this.container.selectAll('text.xaxis').remove();
+			
+			this.htmlWrapper.selectAll('div.chartInfo').remove();
 
           	var rectsBg = this.svg.selectAll('rect.bg').data(data);
 			var rects = this.svg.selectAll('rect.value').data(data);
+			var textXaxis = this.svg.selectAll('text.xaxis').data(data);
+
+			var rectsInfo = this.htmlWrapper.selectAll('div.chartInfo').data(data);
 
 			rectsBg.enter()
 					.append('rect')
@@ -180,19 +212,66 @@ var chart = (function (options) {
 					    .attr("width", 0) 
 						.attr("x", 0);    
          
-
 			rects.enter()
 					.append('rect')
 					    .attr("y", function(d) { return scope.y(d.monto); })
 					    .attr("height", function(d) { return height-scope.y(d.monto); })
 					    .attr("width", 0) 
 						.attr("x", 0)
-						.on('mouseover', function(d){
-							scope.barMouseEnter.call(scope, d3.select(this), d);
+						.on('mouseover', function(d, i){
+							scope.barMouseEnter.call(scope, d3.select(this), d, i);
 						})
-						.on('mouseout', function(d){
-							scope.barMouseOut.call(scope, d3.select(this), d);
-						});      
+						.on('mouseout', function(d, i){
+							scope.barMouseOut.call(scope, d3.select(this), d, i);
+						});  
+
+			textXaxis.enter()
+					.append('text')
+						.classed('xaxis',true)
+					    .attr("x", function(d, i) {return scope.x(i) + barWidth/2 ;})
+						.attr("y", height + 20)
+						.attr('fill', '#686868')
+						.style("text-anchor", "middle")
+						.attr("font-size","15px")
+						.text(function(d){ return xAxisFormat(d.fecha); });      
+
+			var infoWrapper = rectsInfo.enter()
+					.append('div')
+						.attr('class', function(d,i){ return 'chartInfo chartInfo'+i; })
+						.style("opacity", '0')
+						.style("position", 'absolute')
+						.style('background-color', '#D80001')
+					    .style("width", (this.innerWidth * 0.95) + 'px')
+					    .style("top", '20px')
+					    .style("padding", '10px')
+						.style("left", this.options.margin.left + 'px')
+						.style("border-radius", '5px');
+
+			infoWrapper.append('span')
+					.style('color', '#FFFFFF')
+					.style('font-size', '20px')
+					.style('float', 'left')
+					.style('width', '120px')
+					.text(function(d){return 'U$S ' + d.monto;});  
+
+			infoWrapper.append('p')
+					.style('color', '#2F2D30')
+					.style('font-size', '17px')
+					.style('padding-left', '130px')
+					.style('margin', '0')
+					//.style("width", ((this.innerWidth * 0.93)-150) + 'px')
+					.text(function(d){return d.informacion;});  
+
+			infoWrapper.append("div")
+    				//.attr("transform", function(d, i) {return 'translate('+[scope.x(i) + barWidth/2 - 15,59]+')';})
+    				.style('border-top', '15px solid #D80001')
+    				.style('border-bottom', 'none')
+    				.style('border-left', '10px solid transparent')
+    				.style('border-right', '10px solid transparent')
+    				.style('position','absolute')
+    				.style('left', function(d,i){ return (scope.x(i) - 10 + barWidth/2 ) + 'px'})
+    				.style('bottom','-15px');
+
 
             rectsBg
             	.transition()
@@ -207,33 +286,24 @@ var chart = (function (options) {
 					.attr("width", barWidth) 
 					.attr("x", function(d, i) { return scope.x(i); });
 
-			rectsBg.exit()
-				.transition()
-					.attr("width", 0) 
-					.attr("x", 0)
-					.remove();
-
-			rects.exit()
-				.classed('value',false)
-				.transition()
-					.attr("width", 0) 
-					.attr("x", this.innerWidth)
-					.remove();
-
 			scope.svg.selectAll('rect.value:last-child')
 				.classed('last',true)
 				.attr('fill', '#D80001');
-                          	
+
+			this.htmlWrapper.select('.chartInfo.chartInfo'+(this.currentData.length-1)).style("opacity", '1');
 		},
 
-		barMouseEnter: function(el, d) {
+		barMouseEnter: function(el, d, i) {
+
+			this.htmlWrapper.selectAll('.chartInfo').style("opacity", '0');
+			this.htmlWrapper.select('.chartInfo.chartInfo'+i).style("opacity", '1');
+			
 			this.svg.selectAll('rect.value').transition().attr('fill', '#2F2D2E');
 			el.transition().attr('fill', '#D80001');
 		},
 
-		barMouseOut: function(el, d) {
-			el.transition().attr('fill', '#2F2D2E');
-			this.svg.selectAll('rect.last').transition().attr('fill', '#D80001');
+		barMouseOut: function(el, d, i) {
+
 		}
 		
 	}
