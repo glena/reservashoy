@@ -80,13 +80,11 @@ var chart = (function (options) {
 			this.innerWidth  = this.options.width - this.options.margin.left - this.options.margin.right,
             this.innerHeight = this.options.height - this.options.margin.top - this.options.margin.bottom;
              
-            this.x = d3.scale.ordinal().rangeBands([this.innerWidth * 0.05,this.innerWidth * 0.95]);
+            this.x = d3.scale.ordinal().rangeBands([this.innerWidth * 0.02,this.innerWidth * 0.95]);
           
 			this.y = d3.scale.linear().range(
 					[this.innerHeight,0]
                 );
-          
-
 
             this.yAxis = d3.svg.axis()
 							.scale(this.y)
@@ -102,11 +100,7 @@ var chart = (function (options) {
 							.attr("class", "y axis")
 							.call(this.yAxis);
 
-			yAxisEl.selectAll("path")
-                          .attr("fill", "none")
-                          .attr("fill-opacity","1")
-                          .attr("stroke","#000000")
-                          .attr("stroke-width","1px");
+			yAxisEl.selectAll("path").attr("fill-opacity","0");
 
 			var scope = this;
 			d3.json("data.json?r="+Math.random(), function(error, dataset) {
@@ -128,25 +122,27 @@ var chart = (function (options) {
 		},
 
 		currentData: [],
+		currentSet: null,
 
 		setCurrentData: function(data) {
-			this.currentData = [];
-			var newData = [];
-			data.forEach(function(d){
-				newData.push(d);
-			});
-			this.currentData = newData;
+			this.currentData = data;
 		},
 
 		mostrarUltimos7Dias: function() {
+			if (this.currentSet == '7d') return;
+          	this.currentSet = '7d';
 			this.setCurrentData(this.data.ultimos7dias);
           	this.loadData();	
 		},
 		mostrarUltimos30Dias: function() {
+			if (this.currentSet == '30d') return;
+			this.currentSet = '30d';
 			this.setCurrentData(this.data.ultimos30dias);
 			this.loadData();
 		},
 		mostrarUltimos12Meses: function() {
+			if (this.currentSet == '12m') return;
+          	this.currentSet = '12m';
 			this.setCurrentData(this.data.ultimos12meses);
           	this.loadData();
 		},
@@ -177,33 +173,78 @@ var chart = (function (options) {
 
 			rectsBg.enter()
 					.append('rect')
-            		.classed('bg',true)
-					.attr('fill', '#E8E8E8') //sacar fill
-					.attr("width", barWidth) // hacer dinamico en funcion del ancho
-					.attr("x", function(d, i) { return scope.x(i); })
-				    .attr("y", 0)
-				    .attr("height", height);    
-          
+	            		.classed('bg',true)
+						.attr('fill', '#E8E8E8') 
+					    .attr("y", 0)
+					    .attr("height", height)
+					    .attr("width", 0) 
+						.attr("x", 0);    
+         
 
 			rects.enter()
 					.append('rect')
-            		.classed('value',true)
-					.attr('fill', '#2F2D2E') //sacar fill
-					.attr("width", barWidth) // hacer dinamico en funcion del ancho
-					.attr("x", function(d, i) { return scope.x(i); })
-				    .attr("y", function(d) { return scope.y(d.monto); })
-				    .attr("height", function(d) { return height-scope.y(d.monto); })
-					.on('mouseover', function(d){
-						//console.log(d);
-                	});      
-          
-			rectsBg.exit().remove();
-			rects.exit().remove();
-                	
+					    .attr("y", function(d) { return scope.y(d.monto); })
+					    .attr("height", function(d) { return height-scope.y(d.monto); })
+					    .attr("width", 0) 
+						.attr("x", 0)
+						.on('mouseover', function(d){
+							scope.barMouseEnter.call(scope, d3.select(this), d);
+						})
+						.on('mouseout', function(d){
+							scope.barMouseOut.call(scope, d3.select(this), d);
+						});      
+
+            rectsBg
+            	.transition()
+	            	.attr("width", barWidth) 
+					.attr("x", function(d, i) { return scope.x(i); });
+
+			rects
+				.classed('value',true)
+				.classed('last',false)
+				.attr('fill', '#2F2D2E') 
+				.transition()
+					.attr("width", barWidth) 
+					.attr("x", function(d, i) { return scope.x(i); });
+
+			rectsBg.exit()
+				.transition()
+					.attr("width", 0) 
+					.attr("x", 0)
+					.remove();
+
+			rects.exit()
+				.classed('value',false)
+				.transition()
+					.attr("width", 0) 
+					.attr("x", this.innerWidth)
+					.remove();
+
+			scope.svg.selectAll('rect.value:last-child')
+				.classed('last',true)
+				.attr('fill', '#D80001');
+                          	
+		},
+
+		barMouseEnter: function(el, d) {
+			this.svg.selectAll('rect.value').transition().attr('fill', '#2F2D2E');
+			el.transition().attr('fill', '#D80001');
+		},
+
+		barMouseOut: function(el, d) {
+			el.transition().attr('fill', '#2F2D2E');
+			this.svg.selectAll('rect.last').transition().attr('fill', '#D80001');
 		}
 		
 	}
 
 	return new ReservasHoyChart(options);
 
-})(options)
+})(options);
+
+
+function seleccionFiltro(el, metodo){
+	d3.selectAll('.menu .item').classed('selected', false);
+	d3.select(el).classed('selected', true);
+	metodo.apply(chart);
+}

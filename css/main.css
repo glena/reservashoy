@@ -1,0 +1,51 @@
+body {
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.chart_div{
+	background: #FFFFFF url('/images/chartbg.jpg') repeat-x bottom center;
+	width: 960px;
+	height: 500px;
+	margin: auto;
+	border:1px solid #CDCDCD;
+}
+
+div.menu-wrapper {
+	overflow: hidden;
+	width: 960px;
+	margin: auto;
+}
+
+ul.menu {
+	list-style-type: none;
+	margin:0;
+	padding:0;
+}
+
+ul.menu li {
+	float:left;
+}
+
+ul.menu li.title {
+	color:#D70002;
+	font-size: 25px;
+	text-align: center;
+	width: 150px;
+}
+ul.menu li.item {
+	color:#8d8d8d;
+	background-color: #e8e8e8;
+	border-bottom: 5px solid #cacaca;
+	margin-right: 1px;
+	cursor: pointer;
+	text-align: center;
+	width: 125px;
+	line-height: 35px;
+}
+ul.menu li.item:hover {
+	color:#000000;
+}
+ul.menu li.item.selected {
+	color:#000000;
+	border-bottom: 5px solid #d70000;
+}

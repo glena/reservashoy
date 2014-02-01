@@ -19,16 +19,16 @@ function get($url)
 
 function getUrl($apiKey, $page = '')
 {
-	//return "http://datosdemocraticos.com.ar/api/v1/reservas_internacionales_bcra$page.json?apikey=$apiKey";
+	return "http://datosdemocraticos.com.ar/api/v1/reservas_internacionales_bcra$page.json?apikey=$apiKey";
 
-	return "http://localhost:3000/api/v1/reservas_internacionales_bcra$page.json?apikey=$apiKey";
+	//return "http://localhost:3000/api/v1/reservas_internacionales_bcra$page.json?apikey=$apiKey";
 }
 
 
 $cacheFile = 'data.json';
 
-//$apiKey = 'c237ff6028b3f772ddd00073bfa5c41a57c7032a';
-$apiKey = 'ee46da455d56a4364dc83bee9039f9c3a49e77f6';
+$apiKey = 'c237ff6028b3f772ddd10073bfa5c41a57c7032a';
+//$apiKey = 'ee46da455d56a4364dc83bee9039f9c3a49e77f6';
 
 $data = array();
 
@@ -63,26 +63,47 @@ if ($response->estado == 'ok')
 
 	$ultimos12meses = array();
 
-	$hace7dias = strtotime('-7 days');
-	$hace30dias = strtotime('-30 days');
-	$hace12meses = strtotime('-12 months');
+	//$hoy = time();
+	$hoy = strtotime('2014-01-17');
+
+	$hace7dias = strtotime('-7 days',$hoy);
+	$hace30dias = strtotime('-30 days',$hoy);
+	
+	$primeroDeMes = strtotime('-'.(date('d',$hoy)-1).' days',$hoy);
+	$hace12meses = strtotime('-12 months',$hoy);
 
 	foreach ($data as $item)
 	{
-		$fecha = strtotime($item->fecha);
+		echo "Procesando " . $item->fecha;
+		echo "\n";
+		list($dia,$mes,$anio) = explode('/', $item->fecha);
+		//$fecha = strtotime($item->fecha);
+		$fecha = strtotime("$anio-$mes-$dia");
+		$item->fecha = date('Y-m-d', $fecha);
+
+		if (!isset($item->informacion))
+		{
+			$item->informacion = 'Informacion fecha ' . date('Y-m-d', $fecha);
+		}
 
 		if ($fecha >= $hace7dias)
 		{
+			echo "\t - 7 dias ";
+			echo "\n";
 			$new_data['ultimos7dias'][] = $item;
 		}
 
 		if ($fecha >= $hace30dias)
 		{
+			echo "\t - 30 dias ";
+			echo "\n";
 			$new_data['ultimos30dias'][] = $item;
 		}
 
 		if ($fecha >= $hace12meses)
 		{
+			echo "\t - mes " . date('Y-m-01', $fecha);
+			echo "\n";
 			$ultimos12meses[date('Y-m-01', $fecha)][] = $item;
 		}
 	}
@@ -95,12 +116,12 @@ if ($response->estado == 'ok')
 		foreach($mes as $dia)
 		{
 			$monto += $dia->monto;
-			$informacion += trim($informacion,' .') . '. ';
+			$informacion += trim($item->informacion,' .') . '. ';
 		}
 
 		$new_data['ultimos12meses'][] = array(
 			"fecha" => $fecha,
-			"monto" => $monto,
+			"monto" => $monto / count($mes),
 			"informacion" => trim($informacion)
 		);
 	}
