@@ -1,7 +1,14 @@
 var options = {
 	selector: '.chart_div',
-	width:960,
-	height:500
+	currentValueSelector: '#monto',
+	width:1100,
+	height:520,
+	margin: {
+		top: 100, 
+		right: 20, 
+		bottom: 70, 
+		left: 165
+	}
 };
 
 var chart = (function (options) {
@@ -58,6 +65,12 @@ var chart = (function (options) {
           
             return range;
         },
+
+        formatNumber: function (number)
+		{
+			var formatter = d3.format("0,000");
+			return formatter(number).replace(',','.');
+		},
 	
 		htmlWrapper:null,
 		svg: null,
@@ -107,13 +120,17 @@ var chart = (function (options) {
 			yAxisEl.selectAll("path").attr("fill-opacity","0");
 
 			yAxisEl.append("text")
-					.attr("transform", "rotate(-90) translate(-5,-65)")
+					.attr("transform", "rotate(-90) translate(-5,-75)")
 					.style("text-anchor", "end")
 					.text("Valor: Millones U$S");
 
 
 			var scope = this;
 			d3.json("data.json?r="+Math.random(), function(error, dataset) {
+
+				var monto = dataset.ultimo.monto;
+				d3.select(scope.options.currentValueSelector).text(scope.formatNumber(monto));
+
 				scope.data = dataset;
 				scope.normalize.call(scope, scope.data.ultimos7dias, scope.parseDate);
 				scope.normalize.call(scope, scope.data.ultimos30dias, scope.parseDate);
@@ -164,6 +181,7 @@ var chart = (function (options) {
 			var scope = this;
 			var height 	= this.innerHeight;
 			var barWidth = this.innerWidth * 0.8 / data.length;
+		
 			            
             this.x.domain(this.range(0,data.length,1));
 
@@ -177,8 +195,8 @@ var chart = (function (options) {
                     
           	this.svg.select("g.y.axis").call(this.yAxis);
           	this.svg.selectAll("g.y.axis text")
-          		.attr("font-size","15px")
-          		.attr('fill', '#686868');
+          		.attr("font-size","18px")
+          		.attr('fill', '#2e2e2e');
 
 			this.svg.selectAll('rect.bg')
 				.transition()
@@ -229,48 +247,29 @@ var chart = (function (options) {
 					.append('text')
 						.classed('xaxis',true)
 					    .attr("x", function(d, i) {return scope.x(i) + barWidth/2 ;})
-						.attr("y", height + 20)
-						.attr('fill', '#686868')
+						.attr("y", height + 30)
+						.attr('fill', '#2e2e2e')
 						.style("text-anchor", "middle")
-						.attr("font-size","15px")
+						.attr("font-size","18px")
 						.text(function(d){ return xAxisFormat(d.fecha); });      
 
 			var infoWrapper = rectsInfo.enter()
 					.append('div')
 						.attr('class', function(d,i){ return 'chartInfo chartInfo'+i; })
 						.style("opacity", '0')
-						.style("position", 'absolute')
-						.style('background-color', '#D80001')
 					    .style("width", (this.innerWidth * 0.95) + 'px')
-					    .style("top", '20px')
-					    .style("padding", '10px')
-						.style("left", this.options.margin.left + 'px')
-						.style("border-radius", '5px');
+					    .style("top", '15px')
+						.style("left", this.options.margin.left + 'px');
 
 			infoWrapper.append('span')
-					.style('color', '#FFFFFF')
-					.style('font-size', '20px')
-					.style('float', 'left')
-					.style('width', '120px')
-					.text(function(d){return 'U$S ' + d.monto;});  
+					.text(function(d){return 'U$S ' + scope.formatNumber(d.monto);});  
 
 			infoWrapper.append('p')
-					.style('color', '#2F2D30')
-					.style('font-size', '17px')
-					.style('padding-left', '130px')
-					.style('margin', '0')
-					//.style("width", ((this.innerWidth * 0.93)-150) + 'px')
-					.text(function(d){return d.informacion;});  
+					.text(function(d){return (d.informacion == '' ? '' : 'Evento: ' + d.informacion);});  
 
 			infoWrapper.append("div")
-    				//.attr("transform", function(d, i) {return 'translate('+[scope.x(i) + barWidth/2 - 15,59]+')';})
-    				.style('border-top', '15px solid #D80001')
-    				.style('border-bottom', 'none')
-    				.style('border-left', '10px solid transparent')
-    				.style('border-right', '10px solid transparent')
-    				.style('position','absolute')
-    				.style('left', function(d,i){ return (scope.x(i) - 10 + barWidth/2 ) + 'px'})
-    				.style('bottom','-15px');
+					.classed('triangle', true)
+    				.style('left', function(d,i){ return (scope.x(i) - 10 + barWidth/2 ) + 'px'});
 
 
             rectsBg
@@ -286,7 +285,8 @@ var chart = (function (options) {
 					.attr("width", barWidth) 
 					.attr("x", function(d, i) { return scope.x(i); });
 
-			scope.svg.selectAll('rect.value:last-child')
+
+			d3.select( this.svg.selectAll("rect.value")[0].pop() )
 				.classed('last',true)
 				.attr('fill', '#D80001');
 

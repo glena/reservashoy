@@ -1,24 +1,26 @@
 <!DOCTYPE html>
 <html>
 	<head>
-	
-		<title>Visualizacion del valor de las reservas del BCRA - reservashoy.com.ar</title>
-
-		<script src="http://d3js.org/d3.v3.min.js"></script>
-		
-		<!--[if lt IE 9]><script type="text/javascript" src="/js/flashcanvas.js"></script><![endif]-->
-		<script type="text/javascript" src="/js/canvg.js"></script> 
-		<script type="text/javascript" src="/js/rgbcolor.js"></script>
-		<script type="text/javascript" src="/js/grChartImg.js"></script>  
-
-		<meta content="Monitoreamos las reservas del banco d&aacute;a a d&aacute;a. Fuente: datosdemocraticos.com.ar" name="description" />
-		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
-
+		<script src="/js/d3.v3.min.js"></script>
 		<link href="/css/main.css" media="all" rel="stylesheet" type="text/css" />
-
 	</head>
 	<body>
+		<div class="header">
+			<div class="content">
+				<div class="left-title">
+					<h1>
+						Reservas<br/><b>En Vivo</b>
+					</h1>
+				</div>
+				<div class="right-title">
+					<span class="simbolo">u$s</span>
+					<span id="monto"></span>
+					<span class="texto">millones</span>
+				</div>
+			</div>
 
+			
+		</div>
 		<div class="menu-wrapper">
 			<ul class="menu">
 				<li class="title">&Uacute;ltimos</li>
@@ -28,6 +30,10 @@
 			</ul>
 		</div>
 		<div class="chart_div"></div>
+		<div class="autor">
+			<span><a class="datosdemoc" href="http://datosdemocraticos.com.ar">Datos Democr&aacute;ticos</a> - <a class="glena" href="http://germanlena.com.ar">Germ&aacute;n Lena</a></span>
+			<span class="right"><a class="datos" href="http://datosdemocraticos.com.ar/api/v1/reservas_internacionales_bcra">Reservas Internacionales del B.C.R.A.</a></span>
+		</div>
 
 		<script type="text/javascript" src="/js/reservaschart.js"></script>  
 	</body>

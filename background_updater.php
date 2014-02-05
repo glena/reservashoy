@@ -20,15 +20,12 @@ function get($url)
 function getUrl($apiKey, $page = '')
 {
 	return "http://datosdemocraticos.com.ar/api/v1/reservas_internacionales_bcra$page.json?apikey=$apiKey&reverse=1";
-
-	//return "http://localhost:3000/api/v1/reservas_internacionales_bcra$page.json?apikey=$apiKey";
 }
 
 
 $cacheFile = 'data.json';
 
 $apiKey = 'c237ff6028b3f772ddd10073bfa5c41a57c7032a';
-//$apiKey = 'ee46da455d56a4364dc83bee9039f9c3a49e77f6';
 
 $data = array();
 
@@ -64,40 +61,47 @@ if ($response->estado == 'ok')
 	$ultimos12meses = array();
 
 	//$hoy = time();
-	$hoy = strtotime('2014-01-17');
+	$hoy = strtotime('2014-01-24');
 
-	$hace7dias = strtotime('-7 days',$hoy);
-	$hace30dias = strtotime('-30 days',$hoy);
+	$hace7dias = strtotime('-6 days',$hoy);
+	$hace30dias = strtotime('-29 days',$hoy);
 	
 	$primeroDeMes = strtotime('-'.(date('d',$hoy)-1).' days',$hoy);
-	$hace12meses = strtotime('-12 months',$hoy);
+	$hace12meses = strtotime('-11 months',$hoy);
+
+	$ultimo = null;
 
 	foreach ($data as $item)
 	{
 		echo "Procesando " . $item->fecha;
 		echo "\n";
-		$fecha = strtotime($item->fecha);
-		$item->fecha = date('Y-m-d', $fecha);
+		$item->timestamp = strtotime($item->fecha);
+		$item->fecha = date('Y-m-d', $item->timestamp);
 
-		if ($fecha >= $hace7dias)
+		if (is_null($ultimo) || $item->timestamp > $ultimo->timestamp)
+		{
+			$ultimo = $item;
+		}
+
+		if ($item->timestamp >= $hace7dias)
 		{
 			echo "\t - 7 dias ";
 			echo "\n";
 			$new_data['ultimos7dias'][] = $item;
 		}
 
-		if ($fecha >= $hace30dias)
+		if ($item->timestamp >= $hace30dias)
 		{
 			echo "\t - 30 dias ";
 			echo "\n";
 			$new_data['ultimos30dias'][] = $item;
 		}
 
-		if ($fecha >= $hace12meses)
+		if ($item->timestamp >= $hace12meses)
 		{
-			echo "\t - mes " . date('Y-m-01', $fecha);
+			echo "\t - mes " . date('Y-m-01', $item->timestamp);
 			echo "\n";
-			$ultimos12meses[date('Y-m-01', $fecha)][] = $item;
+			$ultimos12meses[date('Y-m-01', $item->timestamp)][] = $item;
 		}
 	}
 	
@@ -137,6 +141,7 @@ if ($response->estado == 'ok')
 	uasort ( $new_data['ultimos30dias'] , 'sortDesc');
 	uasort ( $new_data['ultimos12meses'] , 'sortDesc');
 
+	$new_data['ultimo'] = $ultimo;
 	$new_data['ultimos7dias'] = array_values($new_data['ultimos7dias']);
 	$new_data['ultimos30dias'] = array_values($new_data['ultimos30dias']);
 	$new_data['ultimos12meses'] = array_values($new_data['ultimos12meses']);
