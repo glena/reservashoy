@@ -60,8 +60,7 @@ if ($response->estado == 'ok')
 
 	$ultimos12meses = array();
 
-	//$hoy = time();
-	$hoy = strtotime('2014-01-24');
+	$hoy = time();
 
 	$hace7dias = strtotime('-6 days',$hoy);
 	$hace30dias = strtotime('-29 days',$hoy);
