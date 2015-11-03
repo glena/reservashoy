@@ -128,7 +128,7 @@ var chart = (function (options) {
 			var scope = this;
 			d3.json("data.json?r="+Math.random(), function(error, dataset) {
 
-				var monto = dataset.ultimo.monto;
+				var monto = dataset.historico[0].monto;
 				d3.select(scope.options.currentValueSelector).text(scope.formatNumber(monto));
 
 				scope.data = dataset;
