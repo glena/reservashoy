@@ -145,7 +145,7 @@ var chart = (function (options) {
 			data.forEach(function(d) {
 				d.fecha = parseDate(d.fecha);
 				d.monto = +d.monto;
-	        });
+	    });
 		},
 
 		currentData: [],
@@ -264,8 +264,6 @@ var chart = (function (options) {
 			infoWrapper.append('span')
 					.text(function(d){return 'U$S ' + scope.formatNumber(d.monto);});  
 
-			infoWrapper.append('p')
-					.text(function(d){return (d.informacion == '' ? '' : 'Evento: ' + d.informacion);});  
 
 			infoWrapper.append("div")
 					.classed('triangle', true)
