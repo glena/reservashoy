@@ -82,7 +82,7 @@ request('http://www.bcra.gov.ar/Estadisticas/estprv010001.asp?descri=1&fecha=Fec
           processed['ultimos12meses'] = _.map(processed['ultimos12meses'], function(ele) {
             return {
               fecha: ele[0].mes,
-              monto: parseInt(_.sum(ele, function(e) {return e.monto}) / ele.length)
+              monto: ele[0].monto
             };
           });
 
