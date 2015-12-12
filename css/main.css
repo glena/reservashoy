@@ -52,6 +52,7 @@ body {
 	color: #8A8889;
 }
 
+.historico_div,
 .chart_div{
 	background: #FFFFFF url('../images/chartbg.jpg') repeat-x bottom center;
 	width: 1100px;
@@ -60,6 +61,15 @@ body {
 	border:1px solid #CDCDCD;
 }
 
+.historico_div {
+	padding:20px 20px 0 20px;
+	width: 1060px;
+	height: auto;
+}
+
+.hidden {
+	display: none;
+}
 div.menu-wrapper {
 	overflow: hidden;
 	width: 1100px;
@@ -167,3 +177,9 @@ ul.menu li.item.selected {
 	width: 35px;
 	vertical-align: middle;
 }
+
+.c3-region.gobiernoDualde { fill: #000000; }
+.c3-region.gobiernoNestor { fill: #007500; }
+.c3-region.gobiernoCristina1 { fill: #F7A0A0; }
+.c3-region.gobiernoCristina2 { fill: #BD0000; }
+.c3-region.gobiernoMacri { fill: #7878E4; }

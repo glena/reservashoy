@@ -60,12 +60,12 @@ request('http://www.bcra.gov.ar/Estadisticas/estprv010001.asp?descri=1&fecha=Fec
 
         })
         .then(function(data){
+          console.log(data[0]);
           console.log('PROCESS');
 
           var processed = {
             historico: data
           }
-
 
           processed['ultimos30dias'] = _.slice(data, 0, 30);
           processed['ultimos7dias'] = _.slice(data, 0, 7);
@@ -116,7 +116,7 @@ request('http://www.bcra.gov.ar/Estadisticas/estprv010001.asp?descri=1&fecha=Fec
               var json_data = JSON.stringify(data);
 
               var username = "glena",
-                token = context.data.githubtoken,
+                token = context.data.github_token,
                 auth = "Basic " + new Buffer(username + ":" + token).toString("base64");
 
               return request({
@@ -139,7 +139,11 @@ request('http://www.bcra.gov.ar/Estadisticas/estprv010001.asp?descri=1&fecha=Fec
               });
             })
             .then(function(response){
+              console.log('DONE', response[1]);
               cb(null, 'DONE');
+            })
+            .catch(function(e) {
+                console.error(e);
             });
 
         });

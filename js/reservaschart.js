@@ -314,5 +314,58 @@ var chart = (function (options) {
 function seleccionFiltro(el, metodo){
 	d3.selectAll('.menu .item').classed('selected', false);
 	d3.select(el).classed('selected', true);
+	d3.select('.chart_div').classed('hidden', false);
+	d3.select('.historico_div').classed('hidden', true);
 	metodo.apply(chart);
+}
+
+var history_loaded = false;
+
+function mostrarHistorico(el) {
+	d3.select('.chart_div').classed('hidden', true);
+	d3.select('.historico_div').classed('hidden', false);
+	d3.selectAll('.menu .item').classed('selected', false);
+	d3.select(el).classed('selected', true);
+
+	if (!history_loaded) {
+		history_loaded = true;
+		initHistorico();
+	}
+}
+
+function initHistorico() {
+	var data = chart.data.historico.reduce(function(prev,value){
+
+    prev[0].push(value.fecha);
+    prev[1].push(value.monto);
+
+    return prev;
+
+  }, [ ['x'], ['U$S M'] ] );
+
+  var chart_historico = c3.generate({
+    bindto: '.historico_div .chart',
+    data: {
+        x: 'x',
+        columns: data
+    },
+    point: {
+        show: false
+    },
+    axis: {
+        x: {
+            type: 'timeseries',
+            tick: {
+                format: '%Y-%m-%d'
+            }
+        }
+    },
+    regions: [
+        {end: '2007-12-10', class: 'gobiernoDualde'},
+        {start: '2003-05-25', end: '2007-12-10', class: 'gobiernoNestor'},
+        {start: '2007-12-10', end: '2011-12-10', class: 'gobiernoCristina1'},
+        {start: '2011-12-10', end: '2015-12-10', class: 'gobiernoCristina2'},
+        {start: '2015-12-10', class: 'gobiernoMacri'}
+    ]
+  });
 }
